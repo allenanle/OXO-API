@@ -1,0 +1,27 @@
+{
+  "name": "tic-tac-toe-api",
+  "version": "1.0.0",
+  "description": "REST API for a tic-tac-toe game. All interaction with the game occurs through hitting various REST endpoints.",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smclendening/tic-tac-toe-api.git"
+  },
+  "author": "Scott Clendening",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smclendening/tic-tac-toe-api/issues"
+  },
+  "homepage": "https://github.com/smclendening/tic-tac-toe-api#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}
