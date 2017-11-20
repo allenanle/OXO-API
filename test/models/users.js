@@ -39,7 +39,9 @@ describe('Users table', () => {
         expect(user.user_id).to.exist;
         expect(user.username).to.equal(newUser.username);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   });
 
   it('should get a list of all users', () => {
@@ -48,7 +50,9 @@ describe('Users table', () => {
         expect(users).to.be.an('array');
         expect(users[0].username).to.exist;
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   })
 
   it('should retrieve a user by id', () => {
@@ -56,7 +60,9 @@ describe('Users table', () => {
       .then(user => {
         expect(user.username).to.equal(testUser.username);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   })
 
   it('should delete a user', () => {
@@ -65,6 +71,8 @@ describe('Users table', () => {
       .then((user) => {
         expect(user).to.be.null;
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   })
 });

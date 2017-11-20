@@ -113,7 +113,7 @@ xdescribe('/users', () => {
 
 });
 
-describe('/games', () => {
+xdescribe('/games', () => {
 
   describe('POST /games', () => {
     it('should create a game', () => {
@@ -124,6 +124,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(201);
           expect(res.body.x_player_id).to.equal(user.id);
         })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })
     });
 
     it('should require a username', () => {
@@ -133,6 +136,9 @@ describe('/games', () => {
         .then(res => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.message).to.equal('A username is required to create a game.');
+        })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
         })
     });
   });
@@ -157,7 +163,10 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(201);
           expect(res.body.o_player_id).to.equal(userTwo.id);
           expect(res.body.status).to.equal('active'); 
-        })         
+        })  
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })       
     });
 
     it('should prevent user from joining a game that already has two players', () => {
@@ -170,8 +179,11 @@ describe('/games', () => {
             expect(res.statusCode).to.equal(403);
             expect(res.body.message).to.equal('That game already has 2 players!');
           })
+          .catch(err => {
+            expect.fail(err.actual, err.expected, err.message);
+          })     
       })
-      .catch(err => (err));
+      .catch(err => console.error(err));
     })
   });
 
@@ -193,7 +205,10 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(200);
           expect(res.body).to.be.an('array');
           expect(res.body[0].id).to.equal(game.game_id);
-        })         
+        })  
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })            
     });
   });
 
@@ -214,7 +229,10 @@ describe('/games', () => {
         .then(res => {
           expect(res.statusCode).to.equal(200);
           expect(res.body.id).to.equal(game.game_id);
-        })          
+        })   
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })            
     });
 
     it('should return a 404 if the specified game does not exist', () => {
@@ -226,6 +244,9 @@ describe('/games', () => {
             expect(res.statusCode).to.equal(404);
             expect(res.body.message).to.equal('Game not found.');  
           })
+          .catch(err => {
+            expect.fail(err.actual, err.expected, err.message);
+          })     
       });
     });
   });
@@ -259,6 +280,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(201);
           expect(res.body.board).to.be.an('array'); // TODO: check specific location
         })          
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })     
     });
 
     it('should prevent a user from making an invalid move', () => {
@@ -275,6 +299,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.message).to.equal('Invalid move.');
         })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })     
     });
 
     it('should prevent a user from making a move in a game that has not started', () => {
@@ -296,6 +323,9 @@ describe('/games', () => {
             expect(res.body.message).to.equal('That game has not started yet.');  
           })
       })
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      })     
     });
 
     it('should prevent a user from making a move in an already completed game', () => {
@@ -314,7 +344,11 @@ describe('/games', () => {
             expect(res.statusCode).to.equal(403); // TODO: see if this is best code
             expect(res.body.message).to.equal('That game is already over.');  
           })
+          .catch(err => {
+            expect.fail(err.actual, err.expected, err.message);
+          })     
       })
+      .catch(err => console.error(err));
     });
 
     xit('should declare a winner when a player wins the game', () => {
@@ -334,6 +368,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.message).to.equal('A user id is required to make a move');
         })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })     
     });
 
     it('should return a 403 if the user does not belong to the specified game', () => {
@@ -350,6 +387,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(403);
           expect(res.body.message).to.equal('You are not in that game.');
         })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })     
     });
 
     it('should prevent a user from making a move if it is not their turn', () => {
@@ -376,7 +416,11 @@ describe('/games', () => {
               expect(res.statusCode).to.equal(403);
               expect(res.body.message).to.equal('It is not your turn.');   
             })
+            .catch(err => {
+              expect.fail(err.actual, err.expected, err.message);
+            })     
         })
+        .catch(err => console.error(err));
     });
   });
 
@@ -399,6 +443,9 @@ describe('/games', () => {
           expect(res.statusCode).to.equal(200);
           expect(res.body.message).to.equal('Game successfully deleted.');
         })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })     
     });
   });
 

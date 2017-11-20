@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+const assert = require('chai').assert;
 const Game = require('../../models/games.js');
 const User = require('../../models/users.js');
 const { db, loadDb } = require('../../db');
@@ -16,7 +17,7 @@ let expectedBoard = [['-', '-', '-'],
                      ['-', '-', '-'],
                      ['-', '-', '-']];
 
-xdescribe('Games table', () => {
+describe('Games table', () => {
 
   before(() => {
     return loadDb(db)
@@ -47,7 +48,9 @@ xdescribe('Games table', () => {
         expect(game.status).to.equal('waiting');
         expect(game.board).to.equal(JSON.stringify(expectedBoard));
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   });
 
   it('should add a user to a game', () => {
@@ -57,7 +60,9 @@ xdescribe('Games table', () => {
         expect(game.o_user_id).to.equal(player2.user_id);
         expect(game.status).to.equal('active');
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      })
   });
 
   it('should update a game when a player makes a move', () => {
@@ -70,7 +75,9 @@ xdescribe('Games table', () => {
         expect(game.board).to.equal(JSON.stringify(updatedBoard));
         expect(game.previous_move_id).to.equal(player1.user_id);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   });
 
   it('should retrieve a game by id', () => {
@@ -80,7 +87,9 @@ xdescribe('Games table', () => {
         expect(game.o_user-id).to.equal(player2.user_id);
         expect(game.status).to.equal('active');
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   })
 
   it('should update the winner of a game', () => {
@@ -90,6 +99,8 @@ xdescribe('Games table', () => {
         expect(game.winner_id).to.equal(player1.user_id);
         expect(game.status).to.equal('finished');
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        expect.fail(err.actual, err.expected, err.message);
+      });
   });
 })
