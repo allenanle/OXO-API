@@ -1,27 +1,42 @@
 require('dotenv').config();
-const expect = require('chai').expect();
+const expect = require('chai').expect;
 const request = require('supertest');
 const app = require('../../app.js');
 const User = require('../../models/users.js');
 const Game = require('../../models/games.js');
 const { db, loadDb } = require('../../db');
 
-
+console.log('HEY OVER HERE', process.env.NODE_ENV);
 
 let user = {
   username: 'scott'
 }
 
+let userTwo = {
+  username: 'mike',
+}
+
+let userThree = {
+  username: 'fred'
+}
+
 const resetDb = () => (
-  db.none('TRUNCATE users, games RESTART IDENTITY CASCADE');
+  db.none('TRUNCATE users, games RESTART IDENTITY CASCADE')
 )
 
-// TODO: once models are set up, add before hook to seed test DB
 before(() => {
   loadDb(db)
   .then(() => User.new(user.username))
   .then(response => {
     user = response;
+    User.new(userTwo.username)
+  })
+  .then(response => {
+    userTwo = response;
+    User.new(userThree.username)
+  })
+  .then(response => {
+    userThree = response;
   })
   .catch(err => console.error(err));
 });
@@ -38,15 +53,16 @@ describe('/users', () => {
       username: 'mike'
     }
 
-    it('should create a user', () => {
+    it('should create a user', (done) => {
       request(app)
         .post('/users')
         .send(testUser)
         .end((err, res) => {
           if (err) {
-            done(err);
+            console.log('WE FOUND AN EROR')
+            return done(err);
           }
-
+          console.log(res.statusCode);
           expect(res.statusCode).to.equal(201);
           expect(res.body.username).to.equal(testUser.username);
           user = res.body;
@@ -54,7 +70,7 @@ describe('/users', () => {
       });
     });
 
-    it('should require a username', () => {
+    it('should require a username', (done) => {
       request(app)
         .post('/users')
         .send()
@@ -71,7 +87,7 @@ describe('/users', () => {
   });
 
   describe('GET /users', () => {
-    it('should get all users', () => {
+    it('should get all users', (done) => {
       request(app)
         .get('/users')
         .end((err, res) => {
@@ -88,9 +104,9 @@ describe('/users', () => {
   });
 
   describe('GET /users/:id', () => {
-    it('should get a specific user', () => {
+    it('should get a specific user', (done) => {
       request(app)
-        .get(`users/${user.id}`)
+        .get(`users/${user.user_id}`)
         .end((err, res) => {
           if (err) {
             done(err);
@@ -104,18 +120,24 @@ describe('/users', () => {
   });
 
   describe('DELETE /users/:id', () => {
-    it('should delete a user', () => {
-      request(app)
-        .delete(`users/${user.id}`)
-        .end((err, res) => {
-          if (err) {
-            done(err);
-          }
-          
-          expect(res.statusCode).to.equal(200);
-          expect(res.body.message).to.equal('User successfully deleted.');
-          done();
-        });
+    it('should delete a user', (done) => {
+
+      let toDelete;
+      User.new('to-delete')
+      .then(user => {
+        toDelete = user;
+        request(app)
+          .delete(`users/${toDelete.user_id}`)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            }
+            
+            expect(res.statusCode).to.equal(200);
+            expect(res.body.message).to.equal('User successfully deleted.');
+            done();
+          });
+      })
     });
   });
 
@@ -123,41 +145,8 @@ describe('/users', () => {
 
 describe('/games', () => {
 
-  let game;
-
-  let userTwo = {
-    username: 'mike',
-  }
-
-  let userThree = {
-    username: 'fred'
-  }
-
-  const moveOne = {
-    user: user.id,
-    row: 0,
-    col: 1
-  }
-
-  before(() => {
-    User.new(userTwo.username)
-    .then(user => {
-      userTwo = user;
-      User.new(userThree.username)
-    })
-    .then(user => {
-      userThree = user;
-      Game.new(user.user_id)
-    })
-    .then(response => {
-      game = response;
-    })
-    .catch(err => console.error(err));
-  })
-
-
   describe('POST /games', () => {
-    it('should create a game', () => {
+    it('should create a game', (done) => {
       request(app)
         .post('/games')
         .send(user)
@@ -172,10 +161,10 @@ describe('/games', () => {
         });
     });
 
-    it('should require a username', () => {
+    it('should require a username', (done) => {
       request(app)
         .post('/games')
-        .send(user)
+        .send()
         .end((err, res) => {
           if (err) {
             done(err);
@@ -188,10 +177,21 @@ describe('/games', () => {
     });
   });
 
-  describe('POST /games/:id/users', () => {
-    it('should add a user to a game', () => {
+  describe('POST /games/:id/users', (done) => {
+
+    let game;
+
+    beforeEach(() => {
+      Game.new(user.user_id)
+      .then(response => {
+        game = response;
+      })
+      .catch(err => console.error(err));
+    })  
+
+    it('should add a user to a game', (done) => {
       request(app)
-        .post(`/games/${game.id}/users`)
+        .post(`/games/${game.game_id}/users`)
         .send(userTwo)
         .end((err, res) => {
           if (err) {
@@ -206,23 +206,37 @@ describe('/games', () => {
         });
     });
 
-    it('should prevent user from joining a game that already has two players', () => {
-      request(app)
-        .post(`/games/${game.id}/users`)
-        .send(userThree)
-        .end((err, res) => {
-          if (err) {
-            done(err);
-          }
-          
-          expect(res.statusCode).to.equal(403);
-          expect(res.body.message).to.equal('That game already has 2 players!');
-        })
+    it('should prevent user from joining a game that already has two players', (done) => {
+      Game.addPlayer(game.game_id, userTwo.user_id)
+      .then(() => {
+        request(app)
+          .post(`/games/${game.game_id}/users`)
+          .send(userThree)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            }
+            
+            expect(res.statusCode).to.equal(403);
+            expect(res.body.message).to.equal('That game already has 2 players!');
+          })
+      })
+      .catch(err => done(err));
     })
   });
 
-  describe('GET /games', () => {
-    it('should get all games', () => {
+  describe('GET /games', (done) => {
+    let game;
+
+    before(() => {  
+      Game.new(user.user_id)
+      .then(response => {
+        game = response;
+      })
+      .catch(err => console.error(err));
+    });
+
+    it('should get all games', (done) => {
       request(app)
         .get('/games')
         .end((err, res) => {
@@ -232,38 +246,42 @@ describe('/games', () => {
           
           expect(res.statusCode).to.equal(200);
           expect(res.body).to.be.an('array');
-          expect(res.body[0].id).to.equal(game.id);
+          expect(res.body[0].id).to.equal(game.game_id);
           done();
         });
     });
   });
 
   describe('GET /games/:id', () => {
-    it('should get a specific game', () => {
+    let game;
+
+    before(() => {  
+      Game.new(user.user_id)
+      .then(response => {
+        game = response;
+      })
+      .catch(err => console.error(err));
+    });
+
+    it('should get a specific game', (done) => {
       request(app)
-        .get(`/games/${game.id}`)
+        .get(`/games/${game.game_id}`)
         .end((err, res) => {
           if (err) {
             done(err);
           }
           
           expect(res.statusCode).to.equal(200);
-          expect(res.body.id).to.equal(game.id);
+          expect(res.body.id).to.equal(game.game_id);
           done();
         });
     });
 
-    it('should return a 404 if the specified game does not exist', () => {
-      let toDelete;
-
-      Game.new(user.user_id)
-      .then(game => {
-        toDelete = game;
-        Game.delete(game.game_id)
-      })
+    it('should return a 404 if the specified game does not exist', (done) => {
+      Game.delete(game.game_id)
       .then(() => {
         request(app)
-          .get(`/games/${toDelete.game_id}`)
+          .get(`/games/${game.game_id}`)
           .end((err, res) => {
             if (err) {
               done(err);
@@ -271,16 +289,35 @@ describe('/games', () => {
 
             expect(res.statusCode).to.equal(404);
             expect(res.body.message).to.equal('Game not found.');
+            done();
           })
-      })
-      .catch(err => done(err));
-    })
+      });
+    });
   });
 
   describe('POST /games/:id/moves', () => {
-    it('should make a move in a game', () => {
+    let game;
+
+    beforeEach(() => {
+      Game.new(user.user_id)
+      .then(response => {
+        Game.addPlayer(game.game_id, userTwo.user_id)
+      })
+      .then(response => {
+        game = response;
+      })
+      .catch(err => console.error(err));
+    })
+
+    const moveOne = {
+      user: user.user_id,
+      row: 0,
+      col: 1
+    }
+
+    it('should make a move in a game', (done) => {
       request(app)
-        .post(`/games/${game.id}/moves`)
+        .post(`/games/${game.game_id}/moves`)
         .send(moveOne)
         .end((err, res) => {
           if (err) {
@@ -293,39 +330,174 @@ describe('/games', () => {
         });
     });
 
-    it('should prevent a user from making an invalid move', () => {
+    it('should prevent a user from making an invalid move', (done) => {
+      const invalidMove = {
+        user: user.user_id,
+        row: -1,
+        col: 1
+      }
 
-    };
+      request(app)
+        .post(`/games/${game.game_id}/moves`)
+        .send(invalidMove)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
 
-    it('should prevent a user from making a move in a game that has not started', () => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.message).to.equal('Invalid move.');
+          done();
+        })
+    });
+
+    it('should prevent a user from making a move in a game that has not started', (done) => {
+      const move = {
+        user: user.user_id,
+        row: 1,
+        col: 1
+      }
+      let newGame;
+
+      Game.new(user.user_id)
+      .then(response => {
+        newGame = response;
+        request(app)
+          .post(`/games/${newGame.game_id}/moves`)
+          .send(move)
+          .end((err, res) => {
+            if (err) {
+              return done(err);
+            }
+
+            expect(res.statusCode).to.equal(403); // TODO: compare with 409
+            expect(res.body.message).to.equal('That game has not started yet.');
+            done();
+          })
+      })
+    });
+
+    it('should prevent a user from making a move in an already completed game', (done) => {
+      const move = {
+        user: user.user_id,
+        row: 1,
+        col: 1
+      }
+
+      Game.updateWinner(game.game_id, user.user_id)
+      .then(() => {
+        request(app)
+          .post(`/games/${game.game_id}/moves`)
+          .send(move)
+          .end((err, res) => {
+            if (err) {
+              return done(err);
+            }
+
+            expect(res.statusCode).to.equal(403); // TODO: see if this is best code
+            expect(res.body.message).to.equal('That game is already over.');
+            done();
+          })
+      })
+    });
+
+    xit('should declare a winner when a player wins the game', (done) => {
 
     });
 
-    it('should prevent a user from making a move in an already completed game', () => {
+    it('should require coordinates and a user id', (done) => {
+      const move = {
+        row: 1,
+        col: 2
+      }
 
+      request(app)
+        .post(`/games/${game.game_id}/moves`)
+        .send(move)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.message).to.equal('A user id is required to make a move');
+          done();
+        })
     });
 
-    it('should declare a winner when a player wins the game', () => {
+    it('should return a 403 if the user does not belong to the specified game', (done) => {
+      const move = {
+        user: userThree.user_id,
+        row: 2,
+        col: 1
+      }
 
+      request(app)
+        .post(`/games/${game.game_id}/moves`)
+        .send(move)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          expect(res.statusCode).to.equal(403);
+          expect(res.body.message).to.equal('You are not in that game.');
+          done();
+        })
     });
 
-    it('should require coordinates and a user id', () => {
+    it('should prevent a user from making a move if it is not their turn', (done) => {
+      const move1 = {
+        user: user.user_id,
+        row: 1,
+        col: 1
+      }
 
-    });
+      const move2 = {
+        user: user.user_id,
+        row: 1,
+        col: 2
+      }
 
-    it('should return a 403 if the user does not belong to the specified game', () => {
+      request(app)
+        .post(`/games/${game.game_id}/moves`)
+        .send(move1)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
 
-    });
+          request(app)
+            .post(`/games/${game.game_id}/moves`)
+            .send(move2)
+            .end((err, res) => {
+              if (err) {
+                return done(err);
+              }
 
-    it('should prevent a user from making a move if it is not their turn', () => {
-
+              expect(res.statusCode).to.equal(403);
+              expect(res.body.message).to.equal('It is not your turn.');
+              done();
+            })
+        })
     });
   });
 
   describe('DELETE /games', () => {
-    it('should delete a game', () => {
+
+    let game;
+
+    before(() => {  
+      Game.new(user.user_id)
+      .then(response => {
+        game = response;
+      })
+      .catch(err => console.error(err));
+    });
+    
+    it('should delete a game', (done) => {
       request(app)
-        .delete(`games/${game.id}`)
+        .delete(`games/${game.game_id}`)
         .end((err, res) => {
           if (err) {
             done(err);
