@@ -11,7 +11,7 @@ module.exports = db => (
       if (!results.length) {
         return db.query('CREATE TYPE game_status AS ENUM(\
         $1, $2, $3)\
-        ', ['waiting', 'active', 'complete'])
+        ', ['waiting', 'active', 'finished'])
       }
     })
   ))
@@ -29,12 +29,12 @@ module.exports = db => (
     db.query('CREATE TABLE IF NOT EXISTS games(\
     game_id SERIAL PRIMARY KEY,\
     status game_status DEFAULT $1,\
-    winner INT REFERENCES users ON DELETE CASCADE,\
+    winner_id INT REFERENCES users ON DELETE CASCADE,\
     board JSONB,\
-    x_player_id INT REFERENCES users ON DELETE CASCADE,\
-    o_player_id INT REFERENCES users ON DELETE CASCADE,\
+    x_user_id INT REFERENCES users ON DELETE CASCADE,\
+    o_user_id INT REFERENCES users ON DELETE CASCADE,\
     created TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,\
-    last_player_move player_type\
+    previous_move INT REFERENCES users ON DELETE CASCADE\
     )', ['waiting'])
   ))
   .catch(err => {

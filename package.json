@@ -7,8 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/server",
-    "start": "node server.js"
+    "test": "NODE_ENV=test && npm run resetdb:test && npm run test:models && npm run test:api",
+    "start": "node server.js",
+    "test:api": "mocha test/server",
+    "test:models": "mocha test/models",
+    "resetdb": "psql -c 'DROP DATABASE IF EXISTS tictactoe;' && psql -c 'CREATE DATABASE tictactoe;'",
+    "resetdb:test": "psql -c 'DROP DATABASE IF EXISTS tictactoetest;' && psql -c 'CREATE DATABASE tictactoetest;'"
   },
   "repository": {
     "type": "git",
@@ -23,8 +27,10 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "chai": "^4.1.2",
+    "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "mocha": "^4.0.1",
+    "pg-promise": "^7.3.2",
     "supertest": "^3.0.0"
   }
 }
