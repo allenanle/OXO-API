@@ -1,12 +1,9 @@
-require('dotenv').config();
 const expect = require('chai').expect;
 const request = require('supertest');
 const app = require('../../app.js');
 const User = require('../../models/users.js');
 const Game = require('../../models/games.js');
 const { db, loadDb } = require('../../db');
-
-console.log('HEY OVER HERE', process.env.NODE_ENV);
 
 let user = {
   username: 'scott'
@@ -24,19 +21,20 @@ const resetDb = () => (
   db.none('TRUNCATE users, games RESTART IDENTITY CASCADE')
 )
 
-before(() => {
+before((done) => {
   loadDb(db)
   .then(() => User.new(user.username))
   .then(response => {
     user = response;
-    User.new(userTwo.username)
+    return User.new(userTwo.username)
   })
   .then(response => {
     userTwo = response;
-    User.new(userThree.username)
+    return User.new(userThree.username)
   })
   .then(response => {
     userThree = response;
+    done();
   })
   .catch(err => console.error(err));
 });
@@ -59,13 +57,10 @@ describe('/users', () => {
         .send(testUser)
         .end((err, res) => {
           if (err) {
-            console.log('WE FOUND AN EROR')
             return done(err);
           }
-          console.log(res.statusCode);
           expect(res.statusCode).to.equal(201);
           expect(res.body.username).to.equal(testUser.username);
-          user = res.body;
           done();
       });
     });
@@ -121,8 +116,8 @@ describe('/users', () => {
 
   describe('DELETE /users/:id', () => {
     it('should delete a user', (done) => {
-
       let toDelete;
+
       User.new('to-delete')
       .then(user => {
         toDelete = user;
@@ -181,10 +176,11 @@ describe('/games', () => {
 
     let game;
 
-    beforeEach(() => {
+    beforeEach((done) => {
       Game.new(user.user_id)
       .then(response => {
         game = response;
+        done();
       })
       .catch(err => console.error(err));
     })  
@@ -225,13 +221,14 @@ describe('/games', () => {
     })
   });
 
-  describe('GET /games', (done) => {
+  describe('GET /games', () => {
     let game;
 
-    before(() => {  
+    before((done) => {  
       Game.new(user.user_id)
       .then(response => {
         game = response;
+        done();
       })
       .catch(err => console.error(err));
     });
@@ -255,10 +252,11 @@ describe('/games', () => {
   describe('GET /games/:id', () => {
     let game;
 
-    before(() => {  
+    before((done) => {  
       Game.new(user.user_id)
       .then(response => {
         game = response;
+        done();
       })
       .catch(err => console.error(err));
     });
@@ -298,13 +296,15 @@ describe('/games', () => {
   describe('POST /games/:id/moves', () => {
     let game;
 
-    beforeEach(() => {
+    beforeEach((done) => {
       Game.new(user.user_id)
       .then(response => {
-        Game.addPlayer(game.game_id, userTwo.user_id)
+        game = response;
+        return Game.addPlayer(game.game_id, userTwo.user_id)
       })
       .then(response => {
         game = response;
+        done();
       })
       .catch(err => console.error(err));
     })
@@ -487,14 +487,15 @@ describe('/games', () => {
 
     let game;
 
-    before(() => {  
+    before((done) => {  
       Game.new(user.user_id)
       .then(response => {
         game = response;
+        done();
       })
       .catch(err => console.error(err));
     });
-    
+
     it('should delete a game', (done) => {
       request(app)
         .delete(`games/${game.game_id}`)
