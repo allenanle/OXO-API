@@ -15,21 +15,21 @@ module.exports.wonGame = (board, row, col, move) => {
 }
 
 function checkRow(board, row, move) {
-  return board[row].filter(slot => slot === move) === 3;
+  return board[row].filter(slot => slot === move).length === 3;
 }
 
 function checkCol(board, col, move) {
-  return board.filter(row => row[col] === move) === 3;
+  return board.filter(row => row[col] === move).length === 3;
 }
 
 function checkDiagonal(board, move) {
   const leftDiag = board.filter((row, i) => {
     return board[i][i] === move;
-  });
+  }).length;
 
   const rightDiag = board.filter((row, i) => {
     return board[i][2 - i] === move;
-  });
+  }).length;
 
   return leftDiag === 3 || rightDiag === 3;
 }

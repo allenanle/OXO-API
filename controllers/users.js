@@ -4,7 +4,6 @@ const User = require('../models/users.js');
 
 router.post('/', (req, res) => {
   const { username } = req.body;
-
   if (!username) {
     return res.status(400).send('A username is required to create a user.');
   }

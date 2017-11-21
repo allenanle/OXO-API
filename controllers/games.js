@@ -93,7 +93,7 @@ router.post('/:id/moves', (req, res) => {
     }
 
     let board = game.board;
-    
+
     if (game.status !== 'active') {
       return res.status(403).send('That game is not active.');
     }
@@ -107,7 +107,6 @@ router.post('/:id/moves', (req, res) => {
     }
 
     if (!isValidMove(board, row, col)) {
-
       return res.status(400).send('Invalid move.');
     }
 
@@ -117,17 +116,16 @@ router.post('/:id/moves', (req, res) => {
     if (wonGame(board, row, col, move)) {
       return Game.updateWinner(game_id, board, user_id)
       .then(game => { 
-        return res.status(201).json({board: game.board, winner: game.winner});
+        return res.status(201).json({board: game.board, winner: move});
       })  
     }
 
     Game.updateBoard(game_id, board, user_id)
     .then(game => {
-      res.status(201).json({board: game.board, winner: game.winner})
+      res.status(201).json({board: game.board})
     })
   })
   .catch(err => {
-    console.log('ERROR NEWGRR', err);
     res.status(400).send(err.message);
   })
 })

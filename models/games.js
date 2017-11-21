@@ -30,8 +30,8 @@ module.exports.getById = game_id => {
 }
 
 module.exports.updateWinner = (game_id, board, player_id) => {
-  return db.oneOrNone('UPDATE games SET winner_id = $1, status = $2, board = $4\
-  WHERE game_id = $3 RETURNING *',
+  return db.oneOrNone('UPDATE games SET winner_id = $3, status = $2, board = $4\
+  WHERE game_id = $1 RETURNING *',
   [game_id, 'finished', player_id, board])
 }
 
