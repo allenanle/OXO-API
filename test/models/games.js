@@ -55,8 +55,7 @@ describe('Games table', () => {
 
   it('should add a user to a game', () => {
     return Game.addPlayer(testGame.game_id, player2.user_id)
-      .then(results => {
-        const game = results[0];
+      .then(game => {
         expect(game.o_user_id).to.equal(player2.user_id);
         expect(game.status).to.equal('active');
       })
@@ -70,8 +69,7 @@ describe('Games table', () => {
     updatedBoard[0][1] = 'X';
 
     return Game.updateBoard(testGame.game_id, updatedBoard, player1.user_id)
-      .then(results => {
-        const game = results[0];
+      .then(game => {
         expect(game.board).to.deep.equal(updatedBoard);
         expect(game.previous_move_id).to.equal(player1.user_id);
       })
@@ -82,8 +80,7 @@ describe('Games table', () => {
 
   it('should retrieve a game by id', () => {
     return Game.getById(testGame.game_id)
-      .then(results => {
-        const game = results[0];
+      .then(game => {
         expect(game.x_user_id).to.equal(player1.user_id);
       })
       .catch(err => {
@@ -92,9 +89,14 @@ describe('Games table', () => {
   })
 
   it('should update the winner of a game', () => {
-    return Game.updateWinner(testGame.game_id, player1.user_id)
-      .then(results => {
-        const game = results[0];
+    let board = [...expectedBoard];
+
+    board[0][0] = 'X';
+    board[1][0] = 'X';
+    board[2][0] = 'X';
+
+    return Game.updateWinner(testGame.game_id, board, player1.user_id)
+      .then(game => {
         expect(game.winner_id).to.equal(player1.user_id);
         expect(game.status).to.equal('finished');
       })
