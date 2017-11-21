@@ -42,7 +42,7 @@ after(() => {
   resetDb();
 })
 
-xdescribe('/users', () => {
+describe('/users', () => {
 
   describe('POST /users', () => {
 

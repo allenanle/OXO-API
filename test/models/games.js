@@ -46,7 +46,7 @@ describe('Games table', () => {
         expect(game.game_id).to.exist;
         expect(game.x_user_id).to.equal(player1.user_id);
         expect(game.status).to.equal('waiting');
-        expect(game.board).to.equal(JSON.stringify(expectedBoard));
+        expect(game.board).to.deep.equal(expectedBoard);
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
@@ -72,7 +72,7 @@ describe('Games table', () => {
     return Game.updateBoard(testGame.game_id, updatedBoard, player1.user_id)
       .then(results => {
         const game = results[0];
-        expect(game.board).to.equal(JSON.stringify(updatedBoard));
+        expect(game.board).to.deep.equal(updatedBoard);
         expect(game.previous_move_id).to.equal(player1.user_id);
       })
       .catch(err => {
@@ -82,10 +82,9 @@ describe('Games table', () => {
 
   it('should retrieve a game by id', () => {
     return Game.getById(testGame.game_id)
-      .then(game => {
+      .then(results => {
+        const game = results[0];
         expect(game.x_user_id).to.equal(player1.user_id);
-        expect(game.o_user-id).to.equal(player2.user_id);
-        expect(game.status).to.equal('active');
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);

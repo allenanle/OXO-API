@@ -30,11 +30,11 @@ module.exports = db => (
     game_id SERIAL PRIMARY KEY,\
     status game_status DEFAULT $1,\
     winner_id INT REFERENCES users ON DELETE CASCADE,\
-    board JSONB,\
+    board text [3][3],\
     x_user_id INT REFERENCES users ON DELETE CASCADE,\
     o_user_id INT REFERENCES users ON DELETE CASCADE,\
     created TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,\
-    previous_move INT REFERENCES users ON DELETE CASCADE\
+    previous_move_id INT REFERENCES users ON DELETE CASCADE\
     )', ['waiting'])
   ))
   .catch(err => {
