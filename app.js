@@ -1,12 +1,14 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const UserController = require('./controllers/users.js');
+const GameController = require('./controllers/games.js');
 
-app.get('/users', (req, res) => {
-  res.status(200).json([]);
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/users', (req, res) => {
-  res.status(201).json({username: 'scott'})
-})
+app.use('/users', UserController);
+app.use('/games', GameController);
+
 
 module.exports = app;
