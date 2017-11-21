@@ -8,7 +8,11 @@ router.post('/', (req, res) => {
     return res.status(400).send('A username is required to create a user.');
   }
 
-  return User.new(username)
+  if (typeof username !== 'string') {
+    return res.status(400).send('Username must be sent as a string.');
+  }
+
+  User.new(username)
   .then(user => {
     res.status(201).json(user);
   })
@@ -18,7 +22,7 @@ router.post('/', (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  return User.getAll()
+  User.getAll()
   .then(users => {
     res.status(200).json(users);
   })
@@ -30,7 +34,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   // TODO: what if id does not exist - check err message
-  return User.getById(id)
+  User.getById(id)
   .then(user => {
     res.status(200).json(user);
   })
@@ -42,7 +46,7 @@ router.get('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  return User.delete(id)
+  User.delete(id)
   .then(user => {
     res.status(200).send('User successfully deleted.');
   })

@@ -29,7 +29,7 @@ module.exports = db => (
     db.query('CREATE TABLE IF NOT EXISTS games(\
     game_id SERIAL PRIMARY KEY,\
     status game_status DEFAULT $1,\
-    winner_id INT REFERENCES users ON DELETE CASCADE,\
+    winner player_type,\
     board text [3][3],\
     x_user_id INT REFERENCES users ON DELETE CASCADE,\
     o_user_id INT REFERENCES users ON DELETE CASCADE,\

@@ -29,14 +29,14 @@ module.exports.getById = game_id => {
   return db.oneOrNone('SELECT * FROM games WHERE game_id = $1', [game_id])
 }
 
-module.exports.updateWinner = (game_id, board, player_id) => {
-  return db.oneOrNone('UPDATE games SET winner_id = $3, status = $2, board = $4\
+module.exports.updateWinner = (game_id, board, winner) => {
+  return db.oneOrNone('UPDATE games SET winner = $3, status = $2, board = $4\
   WHERE game_id = $1 RETURNING *',
-  [game_id, 'finished', player_id, board])
+  [game_id, 'finished', winner, board])
 }
 
 module.exports.getPlayersByGameId = (game_id) => {
-  return db.query('SELECT x_user_id, o_user_id FROM games\
+  return db.oneOrNone('SELECT x_user_id, o_user_id FROM games\
   WHERE game_id = $1', [game_id]);
 }
 

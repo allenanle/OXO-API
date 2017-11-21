@@ -6,6 +6,14 @@ module.exports.isValidMove = (board, row, col) => {
   return board[row][col] === '-';
 }
 
+module.exports.gameOver = board => {
+  const totalMoves = board.reduce((count, curRow) => {
+    return count + curRow.filter(slot => slot !== '-').length;
+  }, 0);
+
+  return totalMoves === 9;
+}
+
 module.exports.wonGame = (board, row, col, move) => {
   const wonRow = checkRow(board, row, move);
   const wonCol = checkCol(board, col, move);
@@ -33,3 +41,4 @@ function checkDiagonal(board, move) {
 
   return leftDiag === 3 || rightDiag === 3;
 }
+

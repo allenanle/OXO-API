@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Game = require('../models/games.js');
-const { isValidMove, wonGame } = require('./utils.js');
+const { isValidMove, wonGame, gameOver } = require('./utils.js');
 
 router.post('/', (req, res) => {
   const { user_id } = req.body;
@@ -10,12 +10,16 @@ router.post('/', (req, res) => {
     return res.status(400).send('A user id is required to create a game.');
   }
 
-  return Game.new(user_id)
+  if (typeof user_id !== 'number') {
+    return res.status(400).send('User id must be sent as a number.');
+  }
+
+  Game.new(user_id)
   .then(game => {
     res.status(201).json(game);
   })
   .catch(err => {
-    res.status(500).send(err.message);
+    res.status(500).send('');
   });
 });
 
@@ -27,19 +31,27 @@ router.post('/:id/users', (req, res) => {
   if (!user_id) {
     return res.status(400).send('A user id is required to join a game.');
   }
-  return Game.getPlayersByGameId(game_id)
-  .then(results => {
-    const players = results[0];
+
+  if (typeof user_id !== 'number') {
+    return res.status(400).send('User id must be sent as a number.');
+  }
+
+  Game.getPlayersByGameId(game_id)
+  .then(players => {
+
+    if (!players) {
+      return res.status(404).send('Game not found.');
+    }
+
+    if (players.o_user_id === user_id || players.x_user_id === user_id) {
+      return res.status(403).send('You are already playing in that game.');
+    }
 
     if (players.o_user_id) {
       return res.status(403).send('That game already has 2 players!');
     }
 
-    if (players.o_user_id === user_id) {
-      return res.status(403).send('You are already playing in that game.');
-    }
-
-    return Game.addPlayer(game_id, user_id)
+    Game.addPlayer(game_id, user_id)
     .then(game => {;
       res.status(201).json(game);
     })
@@ -53,7 +65,7 @@ router.post('/:id/users', (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  return Game.getAll()
+  Game.getAll()
   .then(games => {
     res.status(200).json(games);
   })
@@ -65,7 +77,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const game_id = req.params.id;
 
-  return Game.getById(game_id)
+  Game.getById(game_id)
   .then(game => {
     if (!game) {
       return res.status(404).send('Game not found.');
@@ -85,14 +97,14 @@ router.post('/:id/moves', (req, res) => {
     return res.status(400).send('A user, row, and column are required to make a move.');
   }
 
-  return Game.getById(game_id)
+  Game.getById(game_id)
   .then(game => {
 
     if (!game) {
       return res.status(404).send('Game not found.');
     }
 
-    let board = game.board;
+    const board = game.board;
 
     if (game.status !== 'active') {
       return res.status(403).send('That game is not active.');
@@ -112,21 +124,38 @@ router.post('/:id/moves', (req, res) => {
 
     const move = game.x_user_id === user_id ? 'X' : 'O'
     board[row][col] = move;
+    const playerWonGame = wonGame(board, row, col, move);
 
-    if (wonGame(board, row, col, move)) {
-      return Game.updateWinner(game_id, board, user_id)
+    if (playerWonGame || gameOver(board)) {
+      const winner = playerWonGame ? move : 'none';
+      return Game.updateWinner(game_id, board, winner)
       .then(game => { 
-        return res.status(201).json({board: game.board, winner: move});
-      })  
+        return res.status(201).json({board: game.board, winner: winner});
+      })
+      .catch(err => console.error(err));
     }
 
     Game.updateBoard(game_id, board, user_id)
     .then(game => {
-      res.status(201).json({board: game.board})
+      return res.status(201).json({board: game.board})
     })
+    .catch(err => console.error(err.message));
   })
   .catch(err => {
-    res.status(400).send(err.message);
+    return res.status(400).send(err.message);
+  })
+
+})
+
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+
+  Game.delete(id)
+  .then(game => {
+    res.status(200).send('Game successfully deleted.');
+  })
+  .catch(err => {
+    res.status(400).send('Error deleting the game.');
   })
 })
 

@@ -332,21 +332,25 @@ describe('API endpoints', () => {
         })     
       });
 
-      xit('should prevent a user from making a move in an already completed game', () => {
+      it('should prevent a user from making a move in an already completed game', () => {
+        const mockBoard = [['X', 'X', 'X'],
+                           ['O', '-', 'O'],
+                           ['-', '-', '-']];
+
         const move = {
           user_id: user.user_id,
           row: 1,
           col: 1
         }
 
-        return Game.updateWinner(game.game_id, user.user_id)
+        return Game.updateWinner(game.game_id, mockBoard, 'X')
         .then(() => {
           return request(app)
             .post(`/games/${game.game_id}/moves`)
             .send(move)
             .then(res => {
               expect(res.statusCode).to.equal(403); // TODO: see if this is best code
-              expect(res.body.message).to.equal('That game is already over.');  
+              expect(res.text).to.equal('That game is not active.');  
             })
             .catch(err => {
               expect.fail(err.actual, err.expected, err.message);
@@ -355,9 +359,62 @@ describe('API endpoints', () => {
         .catch(err => console.error(err));
       });
 
-      xit('should declare a winner when a player wins the game', () => {
+      it('should declare a winner when a player wins the game', () => {
+        const mockBoard = [['-', 'X', 'X'],
+                           ['O', '-', 'O'],
+                           ['-', '-', '-']];
+
+        const move = {
+          user_id: user.user_id,
+          row: 0,
+          col: 0
+        }
+
+        return Game.updateBoard(game.game_id, mockBoard, userTwo.user_id)
+        .then(() => {
+          return request(app)
+            .post(`/games/${game.game_id}/moves`)
+            .send(move)
+            .then(res => {
+              mockBoard[0][0] = 'X';
+              expect(res.statusCode).to.equal(201);
+              expect(res.body.board).to.deep.equal(mockBoard);
+              expect(res.body.winner).to.equal('X');
+            })
+        })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })
 
       });
+
+      it('should end game if game finishes without a winner', () => {
+        const mockBoard = [['O', 'X', 'O'],
+                           ['O', 'X', 'X'],
+                           ['X', 'O', '-']];
+
+        const move = {
+          user_id: user.user_id,
+          row: 2,
+          col: 2
+        }
+
+        return Game.updateBoard(game.game_id, mockBoard, userTwo.userId)
+        .then(() => {
+          return request(app)
+            .post(`/games/${game.game_id}/moves`)
+            .send(move)
+            .then(res => {
+              mockBoard[2][2] = 'X';
+              expect(res.statusCode).to.equal(201);
+              expect(res.body.board).to.deep.equal(mockBoard);
+              expect(res.body.winner).to.equal('none');
+            })
+        })
+        .catch(err => {
+          expect.fail(err.actual, err.expected, err.message);
+        })
+      })
 
       it('should require coordinates and a user id', () => {
         const move = {
@@ -428,12 +485,12 @@ describe('API endpoints', () => {
       });
     });
 
-    xdescribe('DELETE /games', () => {
+    describe('DELETE /games', () => {
 
       let game;
 
       before(() => {  
-        Game.new(user.user_id)
+        return Game.new(user.user_id)
         .then(response => {
           game = response;
         })
@@ -442,10 +499,10 @@ describe('API endpoints', () => {
 
       it('should delete a game', () => {
         return request(app)
-          .delete(`games/${game.game_id}`)
+          .delete(`/games/${game.game_id}`)
           .then(res => {
             expect(res.statusCode).to.equal(200);
-            expect(res.body.message).to.equal('Game successfully deleted.');
+            expect(res.text).to.equal('Game successfully deleted.');
           })
           .catch(err => {
             expect.fail(err.actual, err.expected, err.message);

@@ -95,9 +95,9 @@ describe('Games table', () => {
     board[1][0] = 'X';
     board[2][0] = 'X';
 
-    return Game.updateWinner(testGame.game_id, board, player1.user_id)
+    return Game.updateWinner(testGame.game_id, board, 'X')
       .then(game => {
-        expect(game.winner_id).to.equal(player1.user_id);
+        expect(game.winner).to.equal('X');
         expect(game.status).to.equal('finished');
       })
       .catch(err => {
