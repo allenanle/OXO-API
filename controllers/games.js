@@ -19,6 +19,7 @@ router.post('/', (req, res) => {
     res.status(201).json(game);
   })
   .catch(err => {
+    console.log('error here', err);
     res.status(500).send('');
   });
 });
@@ -130,14 +131,14 @@ router.post('/:id/moves', (req, res) => {
       const winner = playerWonGame ? move : 'none';
       return Game.updateWinner(game_id, board, winner)
       .then(game => { 
-        return res.status(201).json({board: game.board, winner: winner});
+        return res.status(201).json(game);
       })
       .catch(err => console.error(err));
     }
 
     Game.updateBoard(game_id, board, user_id)
     .then(game => {
-      return res.status(201).json({board: game.board})
+      return res.status(201).json(game)
     })
     .catch(err => console.error(err.message));
   })
@@ -152,7 +153,7 @@ router.delete('/:id', (req, res) => {
 
   Game.delete(id)
   .then(game => {
-    res.status(200).send('Game successfully deleted.');
+    res.status(204).send();
   })
   .catch(err => {
     res.status(400).send('Error deleting the game.');

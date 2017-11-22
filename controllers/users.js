@@ -48,7 +48,7 @@ router.delete('/:id', (req, res) => {
 
   User.delete(id)
   .then(user => {
-    res.status(200).send('User successfully deleted.');
+    res.status(204).send();
   })
   .catch(err => {
     res.status(400).send(err.message);

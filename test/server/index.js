@@ -106,8 +106,7 @@ describe('API endpoints', () => {
           return request(app)
             .delete(`/users/${toDelete.user_id}`)
             .then(res => {
-              expect(res.statusCode).to.equal(200);
-              expect(res.text).to.equal('User successfully deleted.');
+              expect(res.statusCode).to.equal(204);
             })  
         })
       });
@@ -501,8 +500,7 @@ describe('API endpoints', () => {
         return request(app)
           .delete(`/games/${game.game_id}`)
           .then(res => {
-            expect(res.statusCode).to.equal(200);
-            expect(res.text).to.equal('Game successfully deleted.');
+            expect(res.statusCode).to.equal(204);
           })
           .catch(err => {
             expect.fail(err.actual, err.expected, err.message);
