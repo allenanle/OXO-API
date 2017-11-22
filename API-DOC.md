@@ -57,30 +57,19 @@ Status: 200 OK
 
 [
   {
-    "game_id": 3,
-    "status": "waiting",
-    "winner": null,
-    "board": [
-      [
-        "-",
-        "-",
-        "-"
-      ],
-      [
-        "-",
-        "-",
-        "-"
-      ],
-      [
-        "-",
-        "-",
-        "-"
-      ]
-    ],
-    "x_user_id": 3,
-    "o_user_id": null,
-    "created": "2017-11-22T01:32:19.819Z",
-    "previous_move_id": null
+    "user_id": 1,
+    "username": "scott",
+    "created": "2017-11-22T01:30:35.896Z"
+  },
+  {
+    "user_id": 3,
+    "username": "mike",
+    "created": "2017-11-22T01:32:08.402Z"
+  },
+  {
+    "user_id": 4,
+    "username": "joe",
+    "created": "2017-11-22T01:38:53.943Z"
   }
 ]
 
@@ -326,7 +315,7 @@ Status: 200 OK
 ## Retrieve status of a specific game
 
 ```
-GET /users/:id
+GET /games/:id
 ```
 
 ### Example Response
