@@ -1,18 +1,44 @@
 # tic-tac-toe-api
 
-REST API for a tic-tac-toe game. All interaction with the game occurs through hitting various REST endpoints.
+REST API for tic-tac-toe. All interaction with the game occurs through hitting various REST endpoints.
 
-### API Documentation
+Users and games can be created from the API endpoints described in the [API documentation](API-DOC.md). 
 
-|Endpoint|Description|
-|---|---|
-|GET /users|Retrieve a list of all users|
-|GET /users/:id|Retrieve a specific user|
-|POST /users|Create a new user|
-|DELETE /users/:id|Delete a user|
-|GET /games|Retrieve a list of all games|
-|GET /games/:id|Retrieve status of a specific game|
-|POST /games|Create a new game|
-|POST /games/:id/users|Add a user to a game
-|POST /games/:id/moves|Make a move within a game|
-|DELETE /games/:id|Delete a game|
+A game begins once two users have joined. Players take turns making moves using the ```/games/:id/moves``` endpoint until either one of the players wins or the board is full.
+
+## API Documentation
+
+See the [API-DOC.md](API-DOC.md) file.
+
+## Usage
+
+This application uses a PostgreSQL database to store user and game information.
+
+To create the database, run the following command:
+```
+npm run resetdb
+```
+
+Once you've created the database, run the following script from within the root directory to start the server:
+```
+npm start
+```
+
+## Development
+
+### Installing Dependencies
+
+From within the root directory:
+
+```
+npm install
+```
+
+### Testing
+
+The test suite is built with **Mocha**, **Chai**, and **Supertest** (for mock HTTP requests). To run all tests:
+
+```
+npm run test
+```
+

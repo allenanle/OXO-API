@@ -27,7 +27,6 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "chai": "^4.1.2",
-    "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "mocha": "^4.0.1",
     "pg-promise": "^7.3.2",
