@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const assert = require('chai').assert;
+
 process.env.NODE_ENV = 'test';
 const Game = require('../../models/games.js');
 const User = require('../../models/users.js');
@@ -14,7 +15,7 @@ let player1;
 let player2;
 let testGame;
 
-let expectedBoard = [['-', '-', '-'],
+const expectedBoard = [['-', '-', '-'],
                      ['-', '-', '-'],
                      ['-', '-', '-']];
 
@@ -25,21 +26,21 @@ describe('Games table', () => {
     .then(() => User.new('scott'))
     .then(user => {
       player1 = user;
-      return User.new('mike')
+      return User.new('mike');
     })
     .then(user => {
       player2 = user;
-      return Game.new(player1.user_id)
+      return Game.new(player1.user_id);
     })
     .then(game => {
       testGame = game;
     })
     .catch(err => console.error(err));
-  })
+  });
 
   after(() => (
     resetDb()
-  ))
+  ));
 
   it('should add a new game to the games table', () => {
     return Game.new(player1.user_id)
@@ -62,7 +63,7 @@ describe('Games table', () => {
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
-      })
+      });
   });
 
   it('should update a game when a player makes a move', () => {
@@ -87,10 +88,10 @@ describe('Games table', () => {
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
       });
-  })
+  });
 
   it('should update the winner of a game', () => {
-    let board = [...expectedBoard];
+    const board = [...expectedBoard];
 
     board[0][0] = 'X';
     board[1][0] = 'X';
@@ -105,4 +106,4 @@ describe('Games table', () => {
         expect.fail(err.actual, err.expected, err.message);
       });
   });
-})
+});

@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run resetdb:test && npm run test:models && npm run test:api",
+    "test": "npm run test:models && npm run test:api",
     "start": "node server.js",
     "test:api": "mocha test/server",
     "test:models": "mocha test/models",

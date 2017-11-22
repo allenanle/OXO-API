@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const request = require('supertest');
+
 process.env.NODE_ENV = 'test';
 const app = require('../../app.js');
 const User = require('../../models/users.js');
@@ -8,32 +9,32 @@ const { db, loadDb } = require('../../db');
 
 const resetDb = () => (
   db.none('TRUNCATE users RESTART IDENTITY CASCADE')
-)
+);
 
 describe('/games endpoints', () => {
 
   let user = {
     username: 'scott'
-  }
+  };
 
   let userTwo = {
     username: 'mike',
-  }
+  };
 
   let userThree = {
     username: 'fred'
-  }
+  };
 
   before(() => {
     return loadDb(db)
     .then(() => User.new(user.username))
     .then(response => {
       user = response;
-      return User.new(userTwo.username)
+      return User.new(userTwo.username);
     })
     .then(response => {
       userTwo = response;
-      return User.new(userThree.username)
+      return User.new(userThree.username);
     })
     .then(response => {
       userThree = response;
@@ -43,7 +44,7 @@ describe('/games endpoints', () => {
 
   after(() => (
     resetDb()
-  ))
+  ));
 
   describe('POST /games', () => {
     it('should create a game', () => {
@@ -56,7 +57,7 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })
+        });
     });
 
     it('should require a user id', () => {
@@ -69,7 +70,7 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })
+        });
     });
   });
 
@@ -83,7 +84,7 @@ describe('/games endpoints', () => {
         game = response;
       })
       .catch(err => console.error(err));
-    })  
+    });
 
     it('should add a user to a game', () => {
       return request(app)
@@ -92,11 +93,11 @@ describe('/games endpoints', () => {
         .then(res => {
           expect(res.statusCode).to.equal(201);
           expect(res.body.o_player_id).to.equal(userTwo.id);
-          expect(res.body.status).to.equal('active'); 
-        })  
+          expect(res.body.status).to.equal('active');
+        })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })       
+        });  
     });
 
     it('should prevent user from joining a game that already has two players', () => {
@@ -111,10 +112,10 @@ describe('/games endpoints', () => {
           })
           .catch(err => {
             expect.fail(err.actual, err.expected, err.message);
-          })     
+          });    
       })
       .catch(err => console.error(err));
-    })
+    });
   });
 
   describe('GET /games', () => {
@@ -135,10 +136,10 @@ describe('/games endpoints', () => {
           expect(res.statusCode).to.equal(200);
           expect(res.body).to.be.an('array');
           expect(res.body[0].game_id).to.exist;
-        })  
+        }) 
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })            
+        });          
     });
   });
 
@@ -159,10 +160,10 @@ describe('/games endpoints', () => {
         .then(res => {
           expect(res.statusCode).to.equal(200);
           expect(res.body.game_id).to.equal(game.game_id);
-        })   
+        })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })            
+        });           
     });
 
     it('should return a 404 if the specified game does not exist', () => {
@@ -176,7 +177,7 @@ describe('/games endpoints', () => {
           })
           .catch(err => {
             expect.fail(err.actual, err.expected, err.message);
-          })     
+          });     
       });
     });
   });
@@ -188,13 +189,13 @@ describe('/games endpoints', () => {
       return Game.new(user.user_id)
       .then(response => {
         game = response;
-        return Game.addPlayer(game.game_id, userTwo.user_id)
+        return Game.addPlayer(game.game_id, userTwo.user_id);
       })
       .then(response => {
         game = response;
       })
       .catch(err => console.error(err));
-    })
+    });
 
     it('should make a move in a game', () => {
 
@@ -202,18 +203,18 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 0,
         col: 1
-      }
+      };
 
       return request(app)
         .post(`/games/${game.game_id}/moves`)
         .send(moveOne)
         .then(res => {
           expect(res.statusCode).to.equal(201);
-          expect(res.body.board).to.be.an('array'); // TODO: check specific location
-        })          
+          expect(res.body.board).to.be.an('array'); 
+        })         
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })     
+        });   
     });
 
     it('should prevent a user from making an invalid move', () => {
@@ -221,7 +222,7 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: -1,
         col: 1
-      }
+      };
 
       return request(app)
         .post(`/games/${game.game_id}/moves`)
@@ -232,7 +233,7 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })     
+        });    
     });
 
     it('should prevent a user from making a move in a game that has not started', () => {
@@ -240,7 +241,7 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 1,
         col: 1
-      }
+      };
 
       let newGame;
 
@@ -251,13 +252,13 @@ describe('/games endpoints', () => {
           .post(`/games/${newGame.game_id}/moves`)
           .send(move)
           .then(res => {
-            expect(res.statusCode).to.equal(403); // TODO: compare with 409
-            expect(res.text).to.equal('That game is not active.');  
-          })
+            expect(res.statusCode).to.equal(403); 
+            expect(res.text).to.equal('That game is not active.'); 
+          });
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
-      })     
+      });     
     });
 
     it('should prevent a user from making a move in an already completed game', () => {
@@ -269,7 +270,7 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 1,
         col: 1
-      }
+      };
 
       return Game.updateWinner(game.game_id, mockBoard, 'X')
       .then(() => {
@@ -277,12 +278,12 @@ describe('/games endpoints', () => {
           .post(`/games/${game.game_id}/moves`)
           .send(move)
           .then(res => {
-            expect(res.statusCode).to.equal(403); // TODO: see if this is best code
+            expect(res.statusCode).to.equal(403); 
             expect(res.text).to.equal('That game is not active.');  
           })
           .catch(err => {
             expect.fail(err.actual, err.expected, err.message);
-          })     
+          });     
       })
       .catch(err => console.error(err));
     });
@@ -296,7 +297,7 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 0,
         col: 0
-      }
+      };
 
       return Game.updateBoard(game.game_id, mockBoard, userTwo.user_id)
       .then(() => {
@@ -308,11 +309,11 @@ describe('/games endpoints', () => {
             expect(res.statusCode).to.equal(201);
             expect(res.body.board).to.deep.equal(mockBoard);
             expect(res.body.winner).to.equal('X');
-          })
+          });
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
-      })
+      });
 
     });
 
@@ -325,7 +326,7 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 2,
         col: 2
-      }
+      };
 
       return Game.updateBoard(game.game_id, mockBoard, userTwo.userId)
       .then(() => {
@@ -337,18 +338,18 @@ describe('/games endpoints', () => {
             expect(res.statusCode).to.equal(201);
             expect(res.body.board).to.deep.equal(mockBoard);
             expect(res.body.winner).to.equal('none');
-          })
+          });
       })
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
-      })
-    })
+      });
+    });
 
     it('should require coordinates and a user id', () => {
       const move = {
         row: 1,
         col: 2
-      }
+      };
 
       return request(app)
         .post(`/games/${game.game_id}/moves`)
@@ -359,7 +360,7 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })     
+        });     
     });
 
     it('should return a 403 if the user does not belong to the specified game', () => {
@@ -367,7 +368,7 @@ describe('/games endpoints', () => {
         user_id: userThree.user_id,
         row: 2,
         col: 1
-      }
+      };
 
       return request(app)
         .post(`/games/${game.game_id}/moves`)
@@ -378,7 +379,7 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })     
+        });     
     });
 
     it('should prevent a user from making a move if it is not their turn', () => {
@@ -386,13 +387,13 @@ describe('/games endpoints', () => {
         user_id: user.user_id,
         row: 1,
         col: 1
-      }
+      };
 
       const move2 = {
         user_id: user.user_id,
         row: 1,
         col: 2
-      }
+      };
 
       return request(app)
         .post(`/games/${game.game_id}/moves`)
@@ -407,7 +408,7 @@ describe('/games endpoints', () => {
             })
             .catch(err => {
               expect.fail(err.actual, err.expected, err.message);
-            })     
+            });     
         })
         .catch(err => console.error(err));
     });
@@ -433,8 +434,8 @@ describe('/games endpoints', () => {
         })
         .catch(err => {
           expect.fail(err.actual, err.expected, err.message);
-        })     
+        });   
     });
   });
 
-})
+});

@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 const bodyParser = require('body-parser');
 const UserController = require('./controllers/users.js');

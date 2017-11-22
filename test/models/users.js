@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+
 process.env.NODE_ENV = 'test';
 const User = require('../../models/users.js');
 const { db, loadDb } = require('../../db');
@@ -9,7 +10,7 @@ const resetDb = () => (
 
 let testUser = {
   username: 'scott'
-}
+};
 
 
 describe('Users table', () => {
@@ -29,7 +30,7 @@ describe('Users table', () => {
 
   const newUser = {
     username: 'newplayer'
-  }
+  };
 
   it('should add a new user to the users table', () => {
     return User.new(newUser.username)
@@ -51,7 +52,7 @@ describe('Users table', () => {
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
       });
-  })
+  });
 
   it('should retrieve a user by id', () => {
     return User.getById(testUser.user_id)
@@ -61,7 +62,7 @@ describe('Users table', () => {
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
       });
-  })
+  });
 
   it('should delete a user', () => {
     return User.delete(testUser.user_id)
@@ -72,5 +73,5 @@ describe('Users table', () => {
       .catch(err => {
         expect.fail(err.actual, err.expected, err.message);
       });
-  })
+  });
 });

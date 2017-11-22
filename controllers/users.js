@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const User = require('../models/users.js');
 
@@ -18,8 +19,8 @@ router.post('/', (req, res) => {
   })
   .catch(err => {
     res.status(400).send('A player with that username already exists.');
-  })
-})
+  });
+});
 
 router.get('/', (req, res) => {
   User.getAll()
@@ -28,8 +29,8 @@ router.get('/', (req, res) => {
   })
   .catch(err => {
     res.status(500).send(err.message);
-  })
-})
+  });
+});
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -40,8 +41,8 @@ router.get('/:id', (req, res) => {
   })
   .catch(err => {
     res.status(400).send(err.message);
-  })
-})
+  });
+});
 
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
@@ -52,7 +53,7 @@ router.delete('/:id', (req, res) => {
   })
   .catch(err => {
     res.status(400).send(err.message);
-  })
-})
+  });
+});
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const pgp = require('pg-promise')();
 const schema = require('./schema.js');
+
 const dbType = process.env.NODE_ENV === 'test' ? 'tictactoetest' : 'tictactoe';
 const url = `postgres://@localhost:5432/${dbType}`;
 const db = pgp(url);
@@ -15,7 +16,7 @@ if (process.env.NODE_ENV !== 'test') {
   })
   .catch((err) => {
     console.error(`Error loading db: ${err}.`);
-  })
+  });
 }
 
 module.exports = { db, loadDb };

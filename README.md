@@ -10,9 +10,27 @@ A game begins once two users have joined. Players take turns making moves using 
 
 See the [API-DOC.md](API-DOC.md) file.
 
+## Tech Stack
+
+  * [Node](https://github.com/nodejs) & [Express](https://github.com/expressjs/express)
+  * [PostgreSQL](https://www.postgresql.org/) with [pg-promise](https://github.com/vitaly-t/pg-promise)
+  * [Mocha](https://mochajs.org/) with [Chai](http://chaijs.com/) and [Supertest](https://www.npmjs.com/package/supertest)
+
 ## Usage
 
 This application uses a PostgreSQL database to store user and game information.
+
+To install Postgres locally on OXS:
+
+```
+brew install postgres
+```
+
+Before creating the database, you may want to switch to the postgres user (which has full superadmin access) with the following command:
+
+```
+sudo -u postgres psql
+```
 
 To create the database, run the following command:
 ```

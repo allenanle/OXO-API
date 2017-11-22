@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const Game = require('../models/games.js');
 const { isValidMove, wonGame, gameOver } = require('./utils.js');
@@ -19,8 +20,7 @@ router.post('/', (req, res) => {
     res.status(201).json(game);
   })
   .catch(err => {
-    console.log('error here', err);
-    res.status(500).send('');
+    res.status(500).send(err.message);
   });
 });
 
@@ -53,17 +53,17 @@ router.post('/:id/users', (req, res) => {
     }
 
     Game.addPlayer(game_id, user_id)
-    .then(game => {;
+    .then(game => {
       res.status(201).json(game);
     })
     .catch(err => {
       res.status(500).send(err.message);
-    })
+    });
   })
   .catch(err => {
     res.status(500).send(err.message);
-  })
-})
+  });
+});
 
 router.get('/', (req, res) => {
   Game.getAll()
@@ -72,8 +72,8 @@ router.get('/', (req, res) => {
   })
   .catch(err => {
     res.status(500).send(err.message);
-  })
-})
+  });
+});
 
 router.get('/:id', (req, res) => {
   const game_id = req.params.id;
@@ -83,12 +83,12 @@ router.get('/:id', (req, res) => {
     if (!game) {
       return res.status(404).send('Game not found.');
     }
-    res.status(200).json(game)
+    res.status(200).json(game);
   })
   .catch(err => {
     res.status(500).send(err.message);
-  })
-})
+  });
+});
 
 router.post('/:id/moves', (req, res) => {
   const game_id = req.params.id;
@@ -123,7 +123,7 @@ router.post('/:id/moves', (req, res) => {
       return res.status(400).send('Invalid move.');
     }
 
-    const move = game.x_user_id === user_id ? 'X' : 'O'
+    const move = game.x_user_id === user_id ? 'X' : 'O';
     board[row][col] = move;
     const playerWonGame = wonGame(board, row, col, move);
 
@@ -138,15 +138,14 @@ router.post('/:id/moves', (req, res) => {
 
     Game.updateBoard(game_id, board, user_id)
     .then(game => {
-      return res.status(201).json(game)
+      return res.status(201).json(game);
     })
     .catch(err => console.error(err.message));
   })
   .catch(err => {
     return res.status(400).send(err.message);
-  })
-
-})
+  });
+});
 
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
@@ -156,8 +155,8 @@ router.delete('/:id', (req, res) => {
     res.status(204).send();
   })
   .catch(err => {
-    res.status(400).send('Error deleting the game.');
-  })
-})
+    res.status(400).send(err.message);
+  });
+});
 
 module.exports = router;

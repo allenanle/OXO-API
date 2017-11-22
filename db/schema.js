@@ -11,7 +11,7 @@ module.exports = db => (
       if (!results.length) {
         return db.query('CREATE TYPE game_status AS ENUM(\
         $1, $2, $3)\
-        ', ['waiting', 'active', 'finished'])
+        ', ['waiting', 'active', 'finished']);
       }
     })
   ))
@@ -21,7 +21,7 @@ module.exports = db => (
       if (!results.length) {
         return db.query('CREATE TYPE player_type AS ENUM(\
         $1, $2, $3)\
-        ', ['X', 'O', 'none'])
+        ', ['X', 'O', 'none']);
       }
     })
   ))
@@ -38,6 +38,6 @@ module.exports = db => (
     )', ['waiting'])
   ))
   .catch(err => {
-    console.log('ERROR IN SCHEMA: ', err)
+    console.error(err);
   })
-)
+);

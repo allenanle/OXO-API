@@ -4,7 +4,7 @@ module.exports.isValidMove = (board, row, col) => {
   }
 
   return board[row][col] === '-';
-}
+};
 
 module.exports.gameOver = board => {
   const totalMoves = board.reduce((count, curRow) => {
@@ -12,7 +12,7 @@ module.exports.gameOver = board => {
   }, 0);
 
   return totalMoves === 9;
-}
+};
 
 module.exports.wonGame = (board, row, col, move) => {
   const wonRow = checkRow(board, row, move);
@@ -20,7 +20,7 @@ module.exports.wonGame = (board, row, col, move) => {
   const wonDiagonal = checkDiagonal(board, move);
 
   return wonRow || wonCol || wonDiagonal;
-}
+};
 
 function checkRow(board, row, move) {
   return board[row].filter(slot => slot === move).length === 3;
