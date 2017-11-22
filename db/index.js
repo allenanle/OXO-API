@@ -1,4 +1,3 @@
-require('dotenv').config();
 const pgp = require('pg-promise')();
 const schema = require('./schema.js');
 const dbType = process.env.NODE_ENV === 'test' ? 'tictactoetest' : 'tictactoe';
