@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const assert = require('chai').assert;
+process.env.NODE_ENV = 'test';
 const Game = require('../../models/games.js');
 const User = require('../../models/users.js');
 const { db, loadDb } = require('../../db');

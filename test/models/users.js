@@ -1,9 +1,7 @@
-require('dotenv').config();
 const expect = require('chai').expect;
+process.env.NODE_ENV = 'test';
 const User = require('../../models/users.js');
 const { db, loadDb } = require('../../db');
-
-
 
 const resetDb = () => (
   db.none('TRUNCATE users RESTART IDENTITY CASCADE')

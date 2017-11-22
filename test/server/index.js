@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const request = require('supertest');
+process.env.NODE_ENV = 'test';
 const app = require('../../app.js');
 const User = require('../../models/users.js');
 const Game = require('../../models/games.js');
