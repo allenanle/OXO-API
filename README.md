@@ -54,7 +54,15 @@ npm install
 
 ### Testing
 
-The test suite is built with **Mocha**, **Chai**, and **Supertest** (for mock HTTP requests). To run all tests:
+The test suite is built with **Mocha**, **Chai**, and **Supertest** (for mock HTTP requests). 
+
+First, create the test database:
+
+```
+npm run resetdb:test
+```
+
+Then, to run all tests:
 
 ```
 npm run test
